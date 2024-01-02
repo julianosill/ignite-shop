@@ -39,7 +39,6 @@ export const Product = styled('a', {
 
         transform: 'translateY(110%)',
         opacity: 0,
-        transition: 'all 0.2s ease-in-out',
 
         strong: {
             fontSize: '$lg',
@@ -56,6 +55,7 @@ export const Product = styled('a', {
         footer: {
             transform: 'translateY(0)',
             opacity: 1,
+            transition: 'all 0.2s ease-in-out',
         },
     },
 })
