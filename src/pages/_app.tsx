@@ -5,6 +5,7 @@ import { Roboto } from 'next/font/google'
 import logo from '../assets/ignite-logo.svg'
 import { globalStyles } from '@/styles/global'
 import { Container, Header } from '@/styles/pages/app'
+import Link from 'next/link'
 
 const roboto = Roboto({
     weight: ['400', '700'],
@@ -23,7 +24,9 @@ export default function App({ Component, pageProps }: AppProps) {
             `}</style>
             <Container>
                 <Header>
-                    <Image src={logo} alt="" />
+                    <Link href="/">
+                        <Image src={logo} alt="" />
+                    </Link>
                 </Header>
                 <Component {...pageProps} />
             </Container>
