@@ -1,5 +1,8 @@
 import { GetStaticPaths, GetStaticProps } from 'next'
+import Image from 'next/image'
 import Stripe from 'stripe'
+import axios from 'axios'
+import { useState } from 'react'
 
 import { stripe } from '@/lib/stripe'
 import {
@@ -7,7 +10,6 @@ import {
     ProductContainer,
     ProductDetails,
 } from '@/styles/pages/product'
-import Image from 'next/image'
 
 interface ProductProps {
     product: {
@@ -16,10 +18,28 @@ interface ProductProps {
         name: string
         price: string
         description: string
+        defaultPriceId: string
     }
 }
 
 export default function Product({ product }: ProductProps) {
+    const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
+        useState(false)
+
+    async function handleBuyProduct() {
+        try {
+            setIsCreatingCheckoutSession(true)
+            const response = await axios.post('/api/checkout', {
+                priceId: product.defaultPriceId,
+            })
+            const { checkoutUrl } = response.data
+            window.location.href = checkoutUrl
+        } catch (error) {
+            setIsCreatingCheckoutSession(false)
+            alert('Checkout error')
+        }
+    }
+
     return (
         <ProductContainer>
             <ImageContainer>
@@ -31,7 +51,12 @@ export default function Product({ product }: ProductProps) {
                 <span>{product.price}</span>
                 <p>{product.description}</p>
 
-                <button>Comprar agora</button>
+                <button
+                    onClick={handleBuyProduct}
+                    disabled={isCreatingCheckoutSession}
+                >
+                    Comprar agora
+                </button>
             </ProductDetails>
         </ProductContainer>
     )
@@ -44,7 +69,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
                 params: { id: 'prod_PIWsqjIcgBWmin' },
             },
         ],
-        fallback: false,
+        fallback: true,
     }
 }
 
@@ -72,6 +97,7 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
                         currency: 'BRL',
                     }).format(price.unit_amount / 100),
                 description: product.description,
+                defaultPriceId: price.id,
             },
         },
         revalidate: 60 * 60 * 1,
